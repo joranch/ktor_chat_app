@@ -44,9 +44,9 @@ class ChatSocketServiceImpl(private val client: HttpClient) : ChatSocketService 
     override fun observeMessages(): Flow<Message> {
         return try {
             socket?.incoming
-                .receiveAsFlow()
-                .filter { it is Frame.Text }
-                .map {
+                ?.receiveAsFlow()
+                ?.filter { it is Frame.Text }
+                ?.map {
                     val json = (it as Frame.Text)?.readText() ?: ""
                     val messageDto = Json.decodeFromString<MessageDto>(json)
                     messageDto.toMessage()
