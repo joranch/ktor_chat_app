@@ -19,7 +19,7 @@ class ChatSocketServiceImpl(private val client: HttpClient) : ChatSocketService 
     override suspend fun initSession(username: String): Resource<Unit> {
         return try {
             socket = client.webSocketRawSession {
-                url(ChatSocketService.EndPoints.ChatSocket.url)
+                url("${ChatSocketService.EndPoints.ChatSocket.url}?username=$username")
 
             }
             if (socket?.isActive == true) {
