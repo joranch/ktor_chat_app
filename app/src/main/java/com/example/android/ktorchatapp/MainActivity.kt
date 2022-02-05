@@ -1,6 +1,7 @@
 package com.example.android.ktorchatapp
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavType
@@ -13,12 +14,15 @@ import com.example.android.ktorchatapp.presentation.username.UsernameScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "username_screen") {
+            NavHost(
+                navController = navController,
+                startDestination = "username_screen"
+            ) {
                 composable("username_screen") {
                     UsernameScreen(onNavigate = navController::navigate)
                 }
@@ -30,8 +34,7 @@ class MainActivity : AppCompatActivity() {
                             nullable = true
                         }
                     )
-                )
-                {
+                ) {
                     val username = it.arguments?.getString("username")
                     ChatScreen(username = username)
                 }

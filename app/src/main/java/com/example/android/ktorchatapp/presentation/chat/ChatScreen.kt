@@ -35,15 +35,13 @@ fun ChatScreen(
     viewModel: ChatViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-
     LaunchedEffect(key1 = true) {
         viewModel.toastEvent.collectLatest { message ->
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
     }
-
-    val lifeCycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(key1 = lifeCycleOwner) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
                 viewModel.connectToChat()
@@ -51,12 +49,11 @@ fun ChatScreen(
                 viewModel.disconnect()
             }
         }
-        lifeCycleOwner.lifecycle.addObserver(observer)
+        lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
-            lifeCycleOwner.lifecycle.removeObserver(observer)
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-
     val state = viewModel.state.value
     Column(
         modifier = Modifier
@@ -74,13 +71,11 @@ fun ChatScreen(
             }
             items(state.messages) { message ->
                 val isOwnMessage = message.username == username
-
                 Box(
                     contentAlignment = if (isOwnMessage) {
                         Alignment.CenterEnd
-                    } else {
-                        Alignment.CenterStart
-                    }, modifier = Modifier.fillMaxWidth()
+                    } else Alignment.CenterStart,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
                         modifier = Modifier
@@ -89,7 +84,6 @@ fun ChatScreen(
                                 val cornerRadius = 10.dp.toPx()
                                 val triangleHeight = 20.dp.toPx()
                                 val triangleWidth = 25.dp.toPx()
-
                                 val trianglePath = Path().apply {
                                     if (isOwnMessage) {
                                         moveTo(size.width, size.height - cornerRadius)
@@ -102,10 +96,7 @@ fun ChatScreen(
                                     } else {
                                         moveTo(0f, size.height - cornerRadius)
                                         lineTo(0f, size.height + triangleHeight)
-                                        lineTo(
-                                            triangleWidth,
-                                            size.height - cornerRadius
-                                        )
+                                        lineTo(triangleWidth, size.height - cornerRadius)
                                         close()
                                     }
                                 }
@@ -136,9 +127,12 @@ fun ChatScreen(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
             TextField(
                 value = viewModel.messageText.value,
                 onValueChange = viewModel::onMessageChange,
@@ -147,10 +141,12 @@ fun ChatScreen(
                 },
                 modifier = Modifier.weight(1f)
             )
-            IconButton(onClick = { viewModel::sendMessage }) {
-                Icon(imageVector = Icons.Default.Send, contentDescription = "Send")
+            IconButton(onClick = viewModel::sendMessage) {
+                Icon(
+                    imageVector = Icons.Default.Send,
+                    contentDescription = "Send"
+                )
             }
         }
     }
-
 }

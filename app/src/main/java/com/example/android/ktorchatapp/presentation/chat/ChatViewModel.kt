@@ -36,20 +36,21 @@ class ChatViewModel @Inject constructor(
         getAllMessages()
         savedStateHandle.get<String>("username")?.let { username ->
             viewModelScope.launch {
-
-                when(val result = chatSocketService.initSession(username)) {
+                val result = chatSocketService.initSession(username)
+                when (result) {
                     is Resource.Success -> {
                         chatSocketService.observeMessages()
                             .onEach { message ->
                                 val newList = state.value.messages.toMutableList().apply {
                                     add(0, message)
                                 }
-                                _state.value = state.value.copy(messages = newList)
+                                _state.value = state.value.copy(
+                                    messages = newList
+                                )
                             }.launchIn(viewModelScope)
                     }
-
                     is Resource.Error -> {
-                        _toastEvent.emit(result.message ?: "Unkown error")
+                        _toastEvent.emit(result.message ?: "Unknown error")
                     }
                 }
             }
@@ -66,17 +67,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage() {
-        viewModelScope.launch {
-            if (messageText.value.isNotBlank())
-                chatSocketService.sendMessage(messageText.value)
-        }
-    }
-
     fun getAllMessages() {
         viewModelScope.launch {
             _state.value = state.value.copy(isLoading = true)
-
             val result = messageService.getAllMessages()
             _state.value = state.value.copy(
                 messages = result,
@@ -85,7 +78,16 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun sendMessage() {
+        viewModelScope.launch {
+            if (messageText.value.isNotBlank()) {
+                chatSocketService.sendMessage(messageText.value)
+            }
+        }
+    }
+
     override fun onCleared() {
+        super.onCleared()
         disconnect()
     }
 }

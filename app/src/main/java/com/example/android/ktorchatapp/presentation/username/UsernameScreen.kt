@@ -19,7 +19,7 @@ fun UsernameScreen(
 ) {
     LaunchedEffect(key1 = true) {
         viewModel.onJoinChat.collectLatest { username ->
-            onNavigate("chatScreen/$username")
+            onNavigate("chat_screen/$username")
         }
     }
 
@@ -29,26 +29,23 @@ fun UsernameScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.End
         ) {
-
             TextField(
                 value = viewModel.usernameText.value,
                 onValueChange = viewModel::onUsernameChange,
                 placeholder = {
-                    Text(text = "Enter username")
+                    Text(text = "Enter a username...")
                 },
-            modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = viewModel::onJoinClick) {
-                Text(text = "Join chat")
+                Text(text = "Join")
             }
         }
     }
-
 }
